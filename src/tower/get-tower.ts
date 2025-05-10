@@ -8,8 +8,8 @@ export const getTower = (args: {
 
   const platform = document.createElement('button')
   platform.classList.add('puzzle__platform')
-  platform.setAttribute('id', `peg-${args.label}`)
-  platform.setAttribute('data-peg-id', args.label)
+  platform.setAttribute('id', `platform-${args.label}`)
+  platform.setAttribute('data-platform-id', args.label)
 
   const peg = document.createElement('div')
   peg.classList.add('puzzle__peg')

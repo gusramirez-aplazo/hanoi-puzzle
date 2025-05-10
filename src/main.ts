@@ -31,7 +31,7 @@ function applyFormChanges(e: Event) {
   destinationLabel = (destination as string) || 'destination'
   helperLabel = (helper as string) || 'helper'
 
-  initBoard({
+  run({
     board,
     disks: Number(disks),
     originLabel,
@@ -40,7 +40,7 @@ function applyFormChanges(e: Event) {
   })
 }
 
-function initBoard(args: {
+function run(args: {
   board: HTMLElement
   disks: number
   originLabel: string
@@ -70,12 +70,14 @@ function initBoard(args: {
   })
 
   board.appendChild(originTower)
-  board.appendChild(destinationTower)
   board.appendChild(helperTower)
+  board.appendChild(destinationTower)
+
+  listenButtons()
 }
 
 if (board) {
-  initBoard({
+  run({
     board,
     disks: Number((disksInput as HTMLInputElement)?.value),
     originLabel,
@@ -84,60 +86,126 @@ if (board) {
   })
 }
 
-const pegOrigin = document.querySelector('#peg-' + originLabel)
-const pegDestination = document.querySelector('#peg-' + destinationLabel)
-const pegHelper = document.querySelector('#peg-' + helperLabel)
+function listenButtons() {
+  const originPlatform = document.querySelector(
+    '#platform-' + originLabel
+  ) as HTMLElement
+  const destinationPlatform = document.querySelector(
+    '#platform-' + destinationLabel
+  ) as HTMLElement
+  const helperPlatform = document.querySelector(
+    '#platform-' + helperLabel
+  ) as HTMLElement
 
-const performPlay = (fromPeg: HTMLElement, toPeg: HTMLElement) => {
-  const diskAtTopFromPeg = fromPeg.querySelector('.puzzle__disk')
-
-  if (!diskAtTopFromPeg) return
-
-  const diskAtTopToPeg = toPeg.querySelector('.puzzle__disk')
-
-  const diskIdFromPeg = diskAtTopFromPeg.getAttribute('data-disk-id')
-    ? Number(diskAtTopFromPeg.getAttribute('data-disk-id'))
-    : -1
-  const diskIdToPeg = diskAtTopToPeg?.getAttribute('data-disk-id')
-    ? Number(diskAtTopToPeg.getAttribute('data-disk-id'))
-    : -1
-
-  if (diskIdToPeg === -1) {
-    toPeg.appendChild(diskAtTopFromPeg)
-  } else if (diskIdFromPeg < diskIdToPeg) {
-    toPeg.appendChild(diskAtTopFromPeg)
-  } else {
-    console.log('Invalid move')
+  const transitiveState: {
+    originPlatformId: string | null
+    fromDiskId: number | null
+  } = {
+    originPlatformId: null,
+    fromDiskId: null,
   }
+
+  const gameStateHandler: ProxyHandler<typeof transitiveState> = {
+    set(target, prop, value) {
+      if (prop !== 'originPlatformId') {
+        return Reflect.set(target, prop, value)
+      }
+
+      // not origin platform is set
+      if (target[prop] == null) {
+        Reflect.set(target, prop, value)
+
+        const platformEle = document.querySelector(
+          '[data-platform-id="' + value + '"]'
+        )
+        const disk = platformEle?.querySelector('.puzzle__disk') ?? null
+        const diskId = Number(disk?.getAttribute('data-disk-id') ?? Infinity)
+
+        if (!disk) {
+          Reflect.set(target, prop, null)
+          alert('No hay discos en la plataforma seleccionada')
+
+          return true
+        }
+
+        Reflect.set(target, 'fromDiskId', diskId)
+        return true
+      }
+
+      // here the originPlatformId is already set
+
+      // if the same platform is clicked again, reset the state
+      if (target.originPlatformId === value) {
+        Reflect.set(target, prop, null)
+        Reflect.set(target, 'fromDiskId', null)
+        return true
+      }
+
+      // find the disk on top at the destination platform
+      const destinationPlatformEle = document.querySelector(
+        '[data-platform-id="' + value + '"]'
+      )
+      const destinationDiskAtTop =
+        destinationPlatformEle?.querySelector('.puzzle__disk') ?? null
+      const diskId = destinationDiskAtTop
+        ? Number(destinationDiskAtTop.getAttribute('data-disk-id'))
+        : Infinity
+
+      // validate the move
+      if ((target.fromDiskId ?? Infinity) >= diskId) {
+        alert('No se puede mover un disco más grande sobre uno más pequeño')
+        return true
+      }
+
+      // if a different platform is clicked, move the disk
+      performMove(
+        target.fromDiskId as number,
+        target.originPlatformId as string,
+        value as string
+      )
+
+      // clear the state
+      Reflect.set(target, prop, null)
+      Reflect.set(target, 'fromDiskId', null)
+
+      return true
+    },
+  }
+
+  const gameStateProxy = new Proxy(transitiveState, gameStateHandler)
+
+  originPlatform?.addEventListener('click', (e) =>
+    setState(e, originPlatform, gameStateProxy)
+  )
+  destinationPlatform?.addEventListener('click', (e) =>
+    setState(e, destinationPlatform, gameStateProxy)
+  )
+  helperPlatform?.addEventListener('click', (e) =>
+    setState(e, helperPlatform, gameStateProxy)
+  )
 }
 
-let state: any[] = []
+function setState(
+  e: Event,
+  target: HTMLElement,
+  proxy: { originPlatformId: string | null; fromDiskId: number | null }
+) {
+  e.preventDefault()
 
-function onePlay(e: Event) {
-  // the current target is the platform that was clicked
-  const target = e.target as HTMLElement
-
-  // if there is no disk in the platform, the state is empty
-  // if (!target.querySelector('.puzzle__disk')) {
-  //   state = []
-  //   return
-  // }
-  console.log(target)
-  console.log(state)
-
-  // if (state.length === 0) {
-  //   state.push(target)
-  // } else if (state.length === 1 && state[0] !== target) {
-  //   state.push(target)
-  // } else if (state.length === 1 && state[0] === target) {
-  //   state = []
-  // } else if (state.length === 2) {
-  //   performPlay(state[0], state[1])
-  // } else {
-  //   state = []
-  // }
+  proxy.originPlatformId = target.getAttribute('data-platform-id') || null
 }
 
-pegOrigin?.addEventListener('click', onePlay)
-pegDestination?.addEventListener('click', onePlay)
-pegHelper?.addEventListener('click', onePlay)
+function performMove(diskId: number, from: string, to: string) {
+  const diskToMove = document.querySelector(
+    `[data-disk-id="${diskId}"`
+  ) as HTMLElement
+  const destinationPlatform = document.querySelector(
+    `[data-platform-id="${to}"]`
+  )
+
+  const destinationDisksContainer = destinationPlatform?.querySelector(
+    '.puzzle__disks'
+  ) as HTMLElement
+
+  destinationDisksContainer?.prepend(diskToMove)
+}
