@@ -1,10 +1,11 @@
+import { config } from './config'
 import './style.css'
 import { getTower } from './tower/get-tower'
 
-let disks = 3
-let originLabel = 'Origén'
-let destinationLabel = 'Destino'
-let helperLabel = 'Auxiliar'
+let currentDisks = 3
+let currentOriginLabel = config.originLabel
+let currentDestinationLabel = config.destinationLabel
+let currentHelperLabel = config.helperLabel
 
 const form = document.querySelector('form')
 const originInput = document.querySelector('#origin')
@@ -13,10 +14,10 @@ const helperInput = document.querySelector('#helper')
 const disksInput = document.querySelector('#disks')
 const board = document.querySelector('.puzzle__board') as HTMLElement
 
-disksInput?.setAttribute('value', disks as any)
-originInput?.setAttribute('value', originLabel)
-destinationInput?.setAttribute('value', destinationLabel)
-helperInput?.setAttribute('value', helperLabel)
+disksInput?.setAttribute('value', currentDisks as any)
+originInput?.setAttribute('value', currentOriginLabel)
+destinationInput?.setAttribute('value', currentDestinationLabel)
+helperInput?.setAttribute('value', currentHelperLabel)
 
 form?.addEventListener('submit', applyFormChanges)
 
@@ -27,16 +28,17 @@ function applyFormChanges(e: Event) {
   const formData = new FormData(target)
   const { disks, origin, destination, helper } = Object.fromEntries(formData)
 
-  originLabel = (origin as string) || 'origin'
-  destinationLabel = (destination as string) || 'destination'
-  helperLabel = (helper as string) || 'helper'
+  currentDisks = Number(disks)
+  currentOriginLabel = String(origin)
+  currentDestinationLabel = String(destination)
+  currentHelperLabel = String(helper)
 
   run({
     board,
-    disks: Number(disks),
-    originLabel,
-    destinationLabel,
-    helperLabel,
+    disks: currentDisks,
+    originLabel: currentOriginLabel,
+    destinationLabel: currentDestinationLabel,
+    helperLabel: currentHelperLabel,
   })
 }
 
@@ -73,28 +75,28 @@ function run(args: {
   board.appendChild(helperTower)
   board.appendChild(destinationTower)
 
-  listenButtons(disks)
+  listenButtons(currentDisks)
 }
 
 if (board) {
   run({
     board,
     disks: Number((disksInput as HTMLInputElement)?.value),
-    originLabel,
-    destinationLabel,
-    helperLabel,
+    originLabel: currentOriginLabel,
+    destinationLabel: currentDestinationLabel,
+    helperLabel: currentHelperLabel,
   })
 }
 
 function listenButtons(disks: number) {
   const originPlatform = document.querySelector(
-    '#platform-' + originLabel
+    '#platform-' + currentOriginLabel
   ) as HTMLElement
   const destinationPlatform = document.querySelector(
-    '#platform-' + destinationLabel
+    '#platform-' + currentDestinationLabel
   ) as HTMLElement
   const helperPlatform = document.querySelector(
-    '#platform-' + helperLabel
+    '#platform-' + currentHelperLabel
   ) as HTMLElement
 
   const transitiveState: {
@@ -123,7 +125,7 @@ function listenButtons(disks: number) {
 
         if (!disk) {
           Reflect.set(target, prop, null)
-          alert('No hay discos en la plataforma seleccionada')
+          alert(config.emptyPlatformErrorMessage)
 
           return true
         }
@@ -153,7 +155,7 @@ function listenButtons(disks: number) {
 
       // validate the move
       if ((target.fromDiskId ?? Infinity) >= diskId) {
-        alert('No se puede mover un disco más grande sobre uno más pequeño')
+        alert(config.invalidMoveErrorMessage)
         return true
       }
 
@@ -234,7 +236,7 @@ function isFinished(numOfDisks: number, destination: string) {
   ) as NodeListOf<HTMLElement>
 
   if (disks.length === numOfDisks) {
-    if (confirm('¡Felicidades! Has completado el juego. ¿Quieres reiniciar?')) {
+    if (confirm(config.finishSuccessMessage)) {
       location.reload()
     }
   }

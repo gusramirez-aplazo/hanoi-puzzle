@@ -106,9 +106,9 @@ body {
 .footer {
   position: fixed;
   bottom: 0;
-  height: 110px;
+  height: auto;
   width: 100%;
-  background: #dedede;
+  background: #defc8534;
   backdrop-filter: blur(100px);
 }
 .get-solution {
@@ -116,6 +116,7 @@ body {
   justify-items: start;
   align-items: center;
   width: 100%;
+  margin-block: 0;
 }
 
 @keyframes move {
