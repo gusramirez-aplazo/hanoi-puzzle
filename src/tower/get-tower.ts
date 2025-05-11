@@ -31,6 +31,7 @@ export const getTower = (args: {
     disk.setAttribute('id', `disk-${i}`)
     disk.setAttribute('data-disk-id', `${i}`)
     disk.setAttribute('style', `width: ${getWidth(args.disks, i)}px;`)
+    disk.textContent = `${i}`
 
     disks.appendChild(disk)
   }

@@ -70,7 +70,7 @@ function run(args: {
 
   board.innerHTML = ''
 
-  const pegHeight = args.disks * 12 + 20
+  const pegHeight = args.disks * 23 + 20
 
   const originTower = getTower({
     label: args.originLabel,

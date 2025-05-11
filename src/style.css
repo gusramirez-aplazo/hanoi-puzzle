@@ -95,10 +95,12 @@ body {
 }
 
 .puzzle__disk {
-  height: 10px;
+  height: 20px;
   width: 100px;
-  margin-top: 2px;
+  margin-top: 3px;
   margin-inline: auto;
+  font-size: 12px;
+  line-height: 2;
   background: lightblue;
   animation: 250ms ease-in-out 0ms 1 normal forwards running move;
 }
