@@ -106,14 +106,14 @@ body {
 .footer {
   position: fixed;
   bottom: 0;
-  height: auto;
+  left: 0;
   width: 100%;
   background: #defc8534;
   backdrop-filter: blur(100px);
 }
 .get-solution {
   display: flex;
-  justify-items: start;
+  justify-content: flex-end;
   align-items: center;
   width: 100%;
   margin-block: 0;
