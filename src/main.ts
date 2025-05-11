@@ -312,7 +312,7 @@ async function renderSolutionSteps(e: Event) {
   }
 
   minimumMovesEle &&
-    (minimumMovesEle.innerText = solution.totalMoves.toString())
+    (minimumMovesEle.innerText = solution.totalMoves.toLocaleString())
   solution.solution.forEach((step) => setSolutionStep(step, solutionList))
 
   solutionFinalContainer.innerHTML = ''
