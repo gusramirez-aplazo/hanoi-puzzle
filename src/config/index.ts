@@ -7,6 +7,8 @@ const INVALID_MOVE_ERROR_MESSAGE =
 const FINISH_SUCCESS_MESSAGE =
   'Congratulations! You have completed the game. Do you want to restart?'
 const BASE_URL = 'https://hanoi.gusramirez.dev'
+const ERROR_GETTING_SOLUTION_MESSAGE =
+  'We encountered an error while getting the solution. We are working on it. Please try again later.'
 
 export const config = {
   originLabel: DEFAULT_ORIGIN_LABEL,
@@ -16,4 +18,5 @@ export const config = {
   invalidMoveErrorMessage: INVALID_MOVE_ERROR_MESSAGE,
   finishSuccessMessage: FINISH_SUCCESS_MESSAGE,
   baseUrl: BASE_URL,
+  errorGettingSolutionMessage: ERROR_GETTING_SOLUTION_MESSAGE,
 }

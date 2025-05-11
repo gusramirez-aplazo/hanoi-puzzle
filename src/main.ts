@@ -1,7 +1,11 @@
 import './style.css'
 
 import { config } from './config'
-import { type HanoiApiRequest, type HanoiSolution } from './entities/api'
+import {
+  type HanoiApiRequest,
+  type HanoiSolution,
+  type HanoiStep,
+} from './entities/api'
 import { getTower } from './tower/get-tower'
 
 let currentDisks = 3
@@ -79,8 +83,8 @@ function run(args: {
 
   listenButtons(currentDisks)
 
-  getSolutionButton?.removeEventListener('click', getSolution)
-  getSolutionButton?.addEventListener('click', getSolution)
+  getSolutionButton?.removeEventListener('click', renderSolutionSteps)
+  getSolutionButton?.addEventListener('click', renderSolutionSteps)
 }
 
 if (board) {
@@ -251,14 +255,51 @@ function isFinished(numOfDisks: number, destination: string) {
   }
 }
 
-function getSolution(e: Event): Promise<HanoiSolution> {
-  const request: HanoiApiRequest = {
+async function renderSolutionSteps(e: Event) {
+  e.preventDefault()
+
+  const solution = await getSolution({
     disks: currentDisks,
     origin: currentOriginLabel,
     destiny: currentDestinationLabel,
     helper: currentHelperLabel,
+  })
+
+  if (!solution || solution.totalMoves < 0) {
+    alert(config.errorGettingSolutionMessage)
+    return
   }
 
+  const solutionContainerTemplate = document.querySelector(
+    '#hanoi-solution-template'
+  ) as HTMLTemplateElement
+  const solutionFinalContainer = document.querySelector(
+    '#hanoi-solution-container'
+  ) as HTMLElement
+
+  const solutionToRender = solutionContainerTemplate.content.cloneNode(
+    true
+  ) as HTMLElement
+
+  const solutionList = solutionToRender.querySelector(
+    '#hanoi-solution-list'
+  ) as HTMLElement
+
+  solution.solution.forEach((step) => setSolutionStep(step, solutionList))
+
+  solutionFinalContainer.appendChild(solutionToRender)
+}
+
+function setSolutionStep(step: HanoiStep, container: HTMLElement) {
+  const item = document.createElement('li')
+  item.classList.add('solution__item')
+
+  item.innerText = `Move disk ${step.disk} from ${step.from} to ${step.to}`
+
+  container.appendChild(item)
+}
+
+function getSolution(request: HanoiApiRequest): Promise<HanoiSolution> {
   return fetch(`${config.baseUrl}/api/v1/hanoi`, {
     method: 'POST',
     body: JSON.stringify(request),
