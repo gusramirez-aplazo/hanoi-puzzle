@@ -73,7 +73,7 @@ function run(args: {
   board.appendChild(helperTower)
   board.appendChild(destinationTower)
 
-  listenButtons()
+  listenButtons(disks)
 }
 
 if (board) {
@@ -86,7 +86,7 @@ if (board) {
   })
 }
 
-function listenButtons() {
+function listenButtons(disks: number) {
   const originPlatform = document.querySelector(
     '#platform-' + originLabel
   ) as HTMLElement
@@ -161,7 +161,8 @@ function listenButtons() {
       performMove(
         target.fromDiskId as number,
         target.originPlatformId as string,
-        value as string
+        value as string,
+        disks
       )
 
       // clear the state
@@ -195,7 +196,12 @@ function setState(
   proxy.originPlatformId = target.getAttribute('data-platform-id') || null
 }
 
-function performMove(diskId: number, from: string, to: string) {
+function performMove(
+  diskId: number,
+  from: string,
+  to: string,
+  numOfDisks: number
+) {
   const diskToMove = document.querySelector(
     `[data-disk-id="${diskId}"`
   ) as HTMLElement
@@ -208,4 +214,28 @@ function performMove(diskId: number, from: string, to: string) {
   ) as HTMLElement
 
   destinationDisksContainer?.prepend(diskToMove)
+
+  setTimeout(() => {
+    isFinished(numOfDisks, to)
+  }, 0)
+}
+
+function isFinished(numOfDisks: number, destination: string) {
+  const destinationPlatform = document.querySelector(
+    `[data-platform-id="${destination}"]`
+  )
+
+  const destinationDisksContainer = destinationPlatform?.querySelector(
+    '.puzzle__disks'
+  ) as HTMLElement
+
+  const disks = destinationDisksContainer?.querySelectorAll(
+    '.puzzle__disk'
+  ) as NodeListOf<HTMLElement>
+
+  if (disks.length === numOfDisks) {
+    if (confirm('¡Felicidades! Has completado el juego. ¿Quieres reiniciar?')) {
+      location.reload()
+    }
+  }
 }
