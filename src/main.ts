@@ -114,16 +114,6 @@ if (board) {
 }
 
 function listenButtons(disks: number) {
-  const originPlatform = document.querySelector(
-    '#platform-' + currentOriginLabel
-  ) as HTMLElement
-  const destinationPlatform = document.querySelector(
-    '#platform-' + currentDestinationLabel
-  ) as HTMLElement
-  const helperPlatform = document.querySelector(
-    '#platform-' + currentHelperLabel
-  ) as HTMLElement
-
   const transitiveState: {
     originPlatformId: string | null
     fromDiskId: number | null
@@ -131,6 +121,15 @@ function listenButtons(disks: number) {
     originPlatformId: null,
     fromDiskId: null,
   }
+  const originPlatformClickableEle = document.querySelector(
+    '#platform-' + currentOriginLabel
+  ) as HTMLButtonElement
+  const destinationPlatformClickableEle = document.querySelector(
+    '#platform-' + currentDestinationLabel
+  ) as HTMLButtonElement
+  const helperPlatformClickableEle = document.querySelector(
+    '#platform-' + currentHelperLabel
+  ) as HTMLButtonElement
 
   const gameStateHandler: ProxyHandler<typeof transitiveState> = {
     set(target, prop, value) {
@@ -206,14 +205,14 @@ function listenButtons(disks: number) {
 
   const gameStateProxy = new Proxy(transitiveState, gameStateHandler)
 
-  originPlatform?.addEventListener('click', (e) =>
-    setState(e, originPlatform, gameStateProxy)
+  originPlatformClickableEle?.addEventListener('click', (e) =>
+    setState(e, originPlatformClickableEle, gameStateProxy)
   )
-  destinationPlatform?.addEventListener('click', (e) =>
-    setState(e, destinationPlatform, gameStateProxy)
+  destinationPlatformClickableEle?.addEventListener('click', (e) =>
+    setState(e, destinationPlatformClickableEle, gameStateProxy)
   )
-  helperPlatform?.addEventListener('click', (e) =>
-    setState(e, helperPlatform, gameStateProxy)
+  helperPlatformClickableEle?.addEventListener('click', (e) =>
+    setState(e, helperPlatformClickableEle, gameStateProxy)
   )
 }
 
@@ -247,7 +246,7 @@ function performMove(
   destinationDisksContainer?.prepend(diskToMove)
 
   setTimeout(() => {
-    isFinished(numOfDisks, to)
+    isFinished(numOfDisks, currentDestinationLabel)
   }, 0)
 }
 
@@ -385,6 +384,16 @@ function animateSolution(timestamp: number) {
     getSolutionButton?.removeAttribute('disabled')
     solvePuzzleButton?.removeAttribute('disabled')
     form?.querySelector('button')?.removeAttribute('disabled')
+
+    document
+      .querySelector('#platform-' + currentOriginLabel)
+      ?.removeAttribute('disabled')
+    document
+      .querySelector('#platform-' + currentDestinationLabel)
+      ?.removeAttribute('disabled')
+    document
+      .querySelector('#platform-' + currentHelperLabel)
+      ?.removeAttribute('disabled')
   }
 }
 
@@ -394,6 +403,16 @@ function autoSolve() {
   getSolutionButton?.setAttribute('disabled', 'true')
   solvePuzzleButton?.setAttribute('disabled', 'true')
   form?.querySelector('button')?.setAttribute('disabled', 'true')
+
+  document
+    .querySelector('#platform-' + currentOriginLabel)
+    ?.setAttribute('disabled', 'true')
+  document
+    .querySelector('#platform-' + currentDestinationLabel)
+    ?.setAttribute('disabled', 'true')
+  document
+    .querySelector('#platform-' + currentHelperLabel)
+    ?.setAttribute('disabled', 'true')
 
   requestAnimationFrame(animateSolution)
 }
