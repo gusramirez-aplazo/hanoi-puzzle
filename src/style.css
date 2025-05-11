@@ -11,6 +11,11 @@
 
 body {
   height: 100dvh;
+  background: #fdfdfd;
+}
+
+.main {
+  padding-bottom: min(30vh, 100px);
 }
 
 .header {
@@ -96,6 +101,21 @@ body {
   margin-inline: auto;
   background: lightblue;
   animation: 250ms ease-in-out 0ms 1 normal forwards running move;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  height: 110px;
+  width: 100%;
+  background: #dedede;
+  backdrop-filter: blur(100px);
+}
+.get-solution {
+  display: flex;
+  justify-items: start;
+  align-items: center;
+  width: 100%;
 }
 
 @keyframes move {
