@@ -72,12 +72,27 @@
         <button class="outline contrast" id="get-solution-button">
           Get Solution
         </button>
+        <button class="contrast" id="solve-puzzle-button">Auto Solve</button>
       </section>
     </footer>
 
     <template id="hanoi-solution-template">
       <h2>Solution</h2>
-      <article>
+      <article class="solution__list-container">
+        <blockquote>
+          <p>
+            The minimum number of moves required to solve the puzzle is
+            <span id="hanoi-solution-moves">0</span>
+          </p>
+          <p
+            class="solution__disclaimer"
+            id="hanoi-partial-solution-disclaimer"
+          >
+            **Showing the first
+            <span id="hanoi-solution-moves-count">100</span>
+            moves
+          </p>
+        </blockquote>
         <ol class="solution__list" id="hanoi-solution-list"></ol>
       </article>
     </template>

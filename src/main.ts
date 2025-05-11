@@ -20,6 +20,8 @@ const helperInput = document.querySelector('#helper')
 const disksInput = document.querySelector('#disks')
 const board = document.querySelector('.puzzle__board') as HTMLElement
 const getSolutionButton = document.querySelector('#get-solution-button')
+const solvePuzzleButton = document.querySelector('#solve-puzzle-button')
+
 disksInput?.setAttribute('value', currentDisks as any)
 originInput?.setAttribute('value', currentOriginLabel)
 destinationInput?.setAttribute('value', currentDestinationLabel)
@@ -29,6 +31,14 @@ form?.addEventListener('submit', applyFormChanges)
 
 function applyFormChanges(e: Event) {
   e.preventDefault()
+
+  const solutionFinalContainer = document.querySelector(
+    '#hanoi-solution-container'
+  ) as HTMLElement
+
+  if (solutionFinalContainer) {
+    solutionFinalContainer.innerHTML = ''
+  }
 
   const target = e.target as HTMLFormElement
   const formData = new FormData(target)
@@ -82,6 +92,8 @@ function run(args: {
   board.appendChild(destinationTower)
 
   listenButtons(currentDisks)
+
+  solvePuzzleButton?.classList.add('button-hidden')
 
   getSolutionButton?.removeEventListener('click', renderSolutionSteps)
   getSolutionButton?.addEventListener('click', renderSolutionSteps)
@@ -258,6 +270,8 @@ function isFinished(numOfDisks: number, destination: string) {
 async function renderSolutionSteps(e: Event) {
   e.preventDefault()
 
+  getSolutionButton?.setAttribute('disabled', 'true')
+
   const solution = await getSolution({
     disks: currentDisks,
     origin: currentOriginLabel,
@@ -276,18 +290,32 @@ async function renderSolutionSteps(e: Event) {
   const solutionFinalContainer = document.querySelector(
     '#hanoi-solution-container'
   ) as HTMLElement
-
   const solutionToRender = solutionContainerTemplate.content.cloneNode(
     true
   ) as HTMLElement
-
+  const minimumMovesEle = solutionToRender.querySelector(
+    '#hanoi-solution-moves'
+  ) as HTMLElement | null
   const solutionList = solutionToRender.querySelector(
     '#hanoi-solution-list'
   ) as HTMLElement
+  const partialSolutionDisclaimer = solutionToRender.querySelector(
+    '#hanoi-partial-solution-disclaimer'
+  ) as HTMLElement | null
 
+  if (solution.solution.length >= solution.totalMoves) {
+    partialSolutionDisclaimer?.remove()
+  }
+
+  minimumMovesEle &&
+    (minimumMovesEle.innerText = solution.totalMoves.toString())
   solution.solution.forEach((step) => setSolutionStep(step, solutionList))
 
+  solutionFinalContainer.innerHTML = ''
   solutionFinalContainer.appendChild(solutionToRender)
+
+  solvePuzzleButton?.classList.remove('button-hidden')
+  getSolutionButton?.removeAttribute('disabled')
 }
 
 function setSolutionStep(step: HanoiStep, container: HTMLElement) {

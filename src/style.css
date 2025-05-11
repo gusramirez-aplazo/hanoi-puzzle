@@ -108,15 +108,39 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: #defc8534;
-  backdrop-filter: blur(100px);
+  background: #defc8576;
+  backdrop-filter: blur(4px);
 }
 .get-solution {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 1rem;
   width: 100%;
   margin-block: 0;
+}
+
+.button-hidden {
+  display: none;
+  pointer-events: none;
+}
+
+.solution__list-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.solution__item {
+  margin-block: 1.5em;
+  font-size: 0.85rem;
+  text-wrap-style: pretty;
+  font-variant-numeric: tabular-nums;
+}
+
+.solution__disclaimer {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: #99c801;
 }
 
 @keyframes move {
