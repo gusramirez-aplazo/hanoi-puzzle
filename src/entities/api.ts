@@ -5,7 +5,7 @@ export interface HanoiStep {
 }
 
 export interface HanoiSolution {
-  totalMoves: number
+  totalMoves: string // bigint as string
   time: number
   solution: HanoiStep[]
 }

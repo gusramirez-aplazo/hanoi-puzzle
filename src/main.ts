@@ -238,7 +238,6 @@ function performMove(
   const destinationPlatform = document.querySelector(
     `[data-platform-id="${to}"]`
   )
-
   const destinationDisksContainer = destinationPlatform?.querySelector(
     '.puzzle__disks'
   ) as HTMLElement
@@ -282,7 +281,7 @@ async function renderSolutionSteps(e: Event) {
     helper: currentHelperLabel,
   })
 
-  if (!solution || solution.totalMoves < 0) {
+  if (!solution || Number(solution.totalMoves) < 0) {
     alert(config.errorGettingSolutionMessage)
     return
   }
@@ -306,12 +305,11 @@ async function renderSolutionSteps(e: Event) {
     '#hanoi-partial-solution-disclaimer'
   ) as HTMLElement | null
 
-  if (solution.solution.length >= solution.totalMoves) {
+  if (solution.solution.length >= Number(solution.totalMoves)) {
     partialSolutionDisclaimer?.remove()
   }
 
-  minimumMovesEle &&
-    (minimumMovesEle.innerText = solution.totalMoves.toLocaleString())
+  minimumMovesEle && (minimumMovesEle.innerText = solution.totalMoves)
   solution.solution.forEach((step) => setSolutionStep(step, solutionList))
 
   solutionFinalContainer.innerHTML = ''
