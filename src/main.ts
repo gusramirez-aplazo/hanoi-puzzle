@@ -12,6 +12,7 @@ let currentDisks = 3
 let currentOriginLabel = config.originLabel
 let currentDestinationLabel = config.destinationLabel
 let currentHelperLabel = config.helperLabel
+let solution: HanoiSolution | null = null
 
 const form = document.querySelector('form')
 const originInput = document.querySelector('#origin')
@@ -97,6 +98,9 @@ function run(args: {
 
   getSolutionButton?.removeEventListener('click', renderSolutionSteps)
   getSolutionButton?.addEventListener('click', renderSolutionSteps)
+
+  solvePuzzleButton?.removeEventListener('click', autoSolve)
+  solvePuzzleButton?.addEventListener('click', autoSolve)
 }
 
 if (board) {
@@ -272,7 +276,7 @@ async function renderSolutionSteps(e: Event) {
 
   getSolutionButton?.setAttribute('disabled', 'true')
 
-  const solution = await getSolution({
+  solution = await getSolution({
     disks: currentDisks,
     origin: currentOriginLabel,
     destiny: currentDestinationLabel,
@@ -350,4 +354,46 @@ function getSolution(request: HanoiApiRequest): Promise<HanoiSolution> {
         solution: [],
       }
     })
+}
+
+let startTime: number | null = null
+let stepIndex = 0
+
+function animateSolution(timestamp: number) {
+  if (!startTime) {
+    startTime = timestamp
+  }
+
+  const elapsed = timestamp - startTime
+  const elapsedSeconds = Number((elapsed / 1000).toFixed(2))
+
+  if (elapsedSeconds >= 0.75 && solution) {
+    performMove(
+      solution.solution[stepIndex].disk,
+      solution.solution[stepIndex].from,
+      solution.solution[stepIndex].to,
+      currentDisks
+    )
+
+    stepIndex++
+    startTime = timestamp
+  }
+
+  if (stepIndex < (solution?.solution.length ?? 0)) {
+    requestAnimationFrame(animateSolution)
+  } else {
+    getSolutionButton?.removeAttribute('disabled')
+    solvePuzzleButton?.removeAttribute('disabled')
+    form?.querySelector('button')?.removeAttribute('disabled')
+  }
+}
+
+function autoSolve() {
+  if (!solution) return
+
+  getSolutionButton?.setAttribute('disabled', 'true')
+  solvePuzzleButton?.setAttribute('disabled', 'true')
+  form?.querySelector('button')?.setAttribute('disabled', 'true')
+
+  requestAnimationFrame(animateSolution)
 }
