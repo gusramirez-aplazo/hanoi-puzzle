@@ -6,6 +6,7 @@ const INVALID_MOVE_ERROR_MESSAGE =
   'You cannot move a larger disk on top of a smaller one'
 const FINISH_SUCCESS_MESSAGE =
   'Congratulations! You have completed the game. Do you want to restart?'
+const BASE_URL = 'https://hanoi.gusramirez.dev'
 
 export const config = {
   originLabel: DEFAULT_ORIGIN_LABEL,
@@ -14,4 +15,5 @@ export const config = {
   emptyPlatformErrorMessage: EMPTY_PLATFORM_ERROR_MESSAGE,
   invalidMoveErrorMessage: INVALID_MOVE_ERROR_MESSAGE,
   finishSuccessMessage: FINISH_SUCCESS_MESSAGE,
+  baseUrl: BASE_URL,
 }

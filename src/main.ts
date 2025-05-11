@@ -1,5 +1,7 @@
-import { config } from './config'
 import './style.css'
+
+import { config } from './config'
+import { type HanoiApiRequest, type HanoiSolution } from './entities/api'
 import { getTower } from './tower/get-tower'
 
 let currentDisks = 3
@@ -13,7 +15,7 @@ const destinationInput = document.querySelector('#destination')
 const helperInput = document.querySelector('#helper')
 const disksInput = document.querySelector('#disks')
 const board = document.querySelector('.puzzle__board') as HTMLElement
-
+const getSolutionButton = document.querySelector('#get-solution-button')
 disksInput?.setAttribute('value', currentDisks as any)
 originInput?.setAttribute('value', currentOriginLabel)
 destinationInput?.setAttribute('value', currentDestinationLabel)
@@ -76,6 +78,9 @@ function run(args: {
   board.appendChild(destinationTower)
 
   listenButtons(currentDisks)
+
+  getSolutionButton?.removeEventListener('click', getSolution)
+  getSolutionButton?.addEventListener('click', getSolution)
 }
 
 if (board) {
@@ -156,6 +161,10 @@ function listenButtons(disks: number) {
       // validate the move
       if ((target.fromDiskId ?? Infinity) >= diskId) {
         alert(config.invalidMoveErrorMessage)
+        // clear the state
+        Reflect.set(target, prop, null)
+        Reflect.set(target, 'fromDiskId', null)
+
         return true
       }
 
@@ -240,4 +249,36 @@ function isFinished(numOfDisks: number, destination: string) {
       location.reload()
     }
   }
+}
+
+function getSolution(e: Event): Promise<HanoiSolution> {
+  const request: HanoiApiRequest = {
+    disks: currentDisks,
+    origin: currentOriginLabel,
+    destiny: currentDestinationLabel,
+    helper: currentHelperLabel,
+  }
+
+  return fetch(`${config.baseUrl}/api/v1/hanoi`, {
+    method: 'POST',
+    body: JSON.stringify(request),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error ?? res.statusText)
+      }
+
+      return await res.json()
+    })
+    .then((data) => data.data)
+    .catch((err) => {
+      console.warn(err)
+
+      return {
+        totalMoves: -1,
+        time: 0,
+        solution: [],
+      }
+    })
 }

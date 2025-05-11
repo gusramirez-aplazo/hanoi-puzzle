@@ -59,14 +59,28 @@
             <div class="puzzle__board"></div>
           </article>
         </section>
+
+        <section
+          class="section__container"
+          id="hanoi-solution-container"
+        ></section>
       </main>
     </section>
 
     <footer class="footer">
       <section class="container get-solution">
-        <button class="outline contrast">Get Solution</button>
+        <button class="outline contrast" id="get-solution-button">
+          Get Solution
+        </button>
       </section>
     </footer>
+
+    <template id="hanoi-solution-template">
+      <h2>Solution</h2>
+      <article>
+        <ol class="solution__list" id="hanoi-solution-list"></ol>
+      </article>
+    </template>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
